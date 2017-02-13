@@ -40,7 +40,7 @@ class Game
       gambler_hand.each do |card|
         puts card
       end
-    if gambler_hand_total == 21
+    if gambler_hand_total == 21 && gambler_hand_counter == 2
       puts "Blackjack! You win!"
       ask_for_rematch
     end
