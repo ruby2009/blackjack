@@ -43,8 +43,9 @@ class Game
     if gambler_hand_total == 21 && gambler_hand_counter == 2
       puts "Blackjack! You win!"
       ask_for_rematch
-    end
+    else
       game_loop
+    end
   end
 
   def game_loop
@@ -67,7 +68,6 @@ class Game
   def hit
     gambler_hand << deck.draw
     puts gambler_hand.last
-    puts "Your total is now #{gambler_hand_total}"
   end
 
   def casino_hand_reader
@@ -122,11 +122,11 @@ class Game
   # Game win conditions
 
   def gambler_win_or_bust
-    if gambler_hand_total > 21
+    if bust
       puts "Busted! You lost."
       ask_for_rematch
     elsif gambler_hand_total < 21
-      puts gambler_hand_total
+      puts "Your total is now #{gambler_hand_total}"
     else
       puts "Bingo! That's 21!"
       win_conditions
