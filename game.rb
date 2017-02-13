@@ -1,7 +1,9 @@
 require 'tty'
 require_relative 'deck'
+require_relative 'score'
 
 class Game
+  extend Score
 
   attr_accessor   :deck,
                   :gambler_hand,
@@ -9,6 +11,7 @@ class Game
                   :prompt
 
   def initialize
+    self.class.hands += 1
     @deck = Deck.new
     @prompt = TTY::Prompt.new
     @gambler_hand = []
@@ -31,6 +34,7 @@ class Game
     puts "The dealer has #{casino_hand[0]} face up"
     if casino_hand_total == 21
       puts "Blackjack house wins! They were also holding #{casino_hand[1]}"
+      self.class.dealer_score += 1
       ask_for_rematch
     end
   end
@@ -42,6 +46,7 @@ class Game
       end
     if gambler_hand_total == 21 && gambler_hand_counter == 2
       puts "Blackjack! You win!"
+      self.class.player_score += 1
       ask_for_rematch
     else
       game_loop
@@ -76,15 +81,12 @@ class Game
   end
 
   def dealer_turn
-    if casino_hand_total == 21
-       puts "The house hit 21!"
-       win_conditions
-       ask_for_rematch
-    elsif casino_hand_total.between?(16, 20)
+    if casino_hand_total.between?(16, 20)
       puts "They are choosing to stay with #{casino_hand_total}."
       win_conditions
     elsif casino_hand_total > 21
       puts "Busted with #{casino_hand_total}!!! House sucks!"
+      self.class.player_score += 1
     else
       dealer_hit
     end
@@ -124,6 +126,7 @@ class Game
   def gambler_win_or_bust
     if bust
       puts "Busted! You lost."
+      self.class.dealer_score += 1
       ask_for_rematch
     elsif gambler_hand_total < 21
       puts "Your total is now #{gambler_hand_total}"
@@ -136,24 +139,30 @@ class Game
   def tie
     if gambler_hand_counter > casino_hand_counter
       puts "You win, you had #{gambler_hand_counter} cards and the dealer only had #{casino_hand_counter}."
+      self.class.player_score += 1
     elsif
       gambler_hand_counter < casino_hand_counter
         puts "You lost, you had #{gambler_hand_counter} cards and the dealer had #{casino_hand_counter}."
+        self.class.dealer_score += 1
     else
       puts "Double tie. We'll give that one to ya!"
+      self.class.player_score += 1
     end
   end
 
   def win_conditions
     if gambler_hand_counter == 6 && gambler_hand_total < 21
       puts "You win with 6 cards. Rare but it can happen!"
+      self.class.player_score += 1
     end
     if gambler_hand_total > casino_hand_total
       puts "You beat the house. Good win."
+      self.class.player_score += 1
     elsif gambler_hand_total == casino_hand_total
       tie
     else
       puts "The dealer won. Boo..."
+      self.class.dealer_score += 1
     end
   end
 
@@ -162,6 +171,7 @@ class Game
     if desire
       Game.new.play
     else
+      puts "You've won #{self.class.player_score} out of #{self.class.hands}"
       puts "Cash me ousside, how bout dat"
       exit
     end
