@@ -121,6 +121,10 @@ class Game
     gambler_hand_total > 21
   end
 
+  def lucky_win
+    gambler_hand_counter == 6 && gambler_hand_total < 21
+  end
+
   # Game win conditions
 
   def gambler_win_or_bust
@@ -151,7 +155,7 @@ class Game
   end
 
   def win_conditions
-    if gambler_hand_counter == 6 && gambler_hand_total < 21
+    if lucky_win
       puts "You win with 6 cards. Rare but it can happen!"
       self.class.player_score += 1
     end
