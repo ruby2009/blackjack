@@ -36,7 +36,7 @@ class Game
   end
 
   def read_player_hand
-    puts "You have:"
+    puts "You have a total of #{gambler_hand_total} with:"
       gambler_hand.each do |card|
         puts card
       end
@@ -84,7 +84,7 @@ class Game
       puts "They are choosing to stay with #{casino_hand_total}."
       win_conditions
     elsif casino_hand_total > 21
-      puts "Busted!!! House sucks!"
+      puts "Busted with #{casino_hand_total}!!! House sucks!"
     else
       dealer_hit
     end
@@ -128,7 +128,6 @@ class Game
     elsif gambler_hand_total < 21
       puts "Your total is now #{gambler_hand_total}"
     else
-      puts "Bingo! That's 21!"
       win_conditions
       ask_for_rematch
     end
