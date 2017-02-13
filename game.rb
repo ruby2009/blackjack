@@ -18,6 +18,8 @@ class Game
     read_player_hand
   end
 
+  # Game setup
+
   def deal
     2.times do
       @gambler_hand << deck.draw
@@ -45,6 +47,34 @@ class Game
       game_loop
   end
 
+  def game_loop
+    until bust
+      hit_or_stay
+    end
+  end
+
+  def hit_or_stay
+    hit_or_stay_switch = prompt.select("Would you like to hit or stay?", {:hit => true, :stay => false})
+    if hit_or_stay_switch
+      hit
+      gambler_win_or_bust
+    else
+      puts "You're choosing to stay with #{gambler_hand_total}"
+      casino_hand_reader
+    end
+  end
+
+  def hit
+    gambler_hand << deck.draw
+    puts gambler_hand.last
+    puts "Your total is now #{gambler_hand_total}"
+  end
+
+  def casino_hand_reader
+    puts "The dealer has #{casino_hand[0]} and #{casino_hand[1]}."
+    dealer_turn
+  end
+
   def dealer_turn
     if casino_hand_total == 21
        puts "The house hit 21!"
@@ -61,21 +91,13 @@ class Game
     ask_for_rematch
   end
 
-  def casino_hand_reader
-    puts "The dealer has #{casino_hand[0]} and #{casino_hand[1]}."
+  def dealer_hit
+    casino_hand << deck.draw
+    puts "The dealer drew #{casino_hand.last}"
     dealer_turn
   end
 
-  def hit_or_stay
-    hit_or_stay_switch = prompt.select("Would you like to hit or stay?", {:hit => true, :stay => false})
-    if hit_or_stay_switch
-      hit
-      gambler_win_or_bust
-    else
-      puts "You're choosing to stay"
-      casino_hand_reader
-    end
-  end
+# Computation methods
 
   def gambler_hand_total
     gambler_hand.inject(0){|sum, card| sum + card.value}
@@ -93,14 +115,11 @@ class Game
     casino_hand.size
   end
 
-  def hit
-    gambler_hand << deck.draw
-    puts gambler_hand.last
-  end
-
   def bust
     gambler_hand_total > 21
   end
+
+  # Game win conditions
 
   def gambler_win_or_bust
     if gambler_hand_total > 21
@@ -112,12 +131,6 @@ class Game
       puts "Bingo! That's 21!"
       win_conditions
       ask_for_rematch
-    end
-  end
-
-  def game_loop
-    until bust
-      hit_or_stay
     end
   end
 
@@ -143,12 +156,6 @@ class Game
     else
       puts "The dealer won. Boo..."
     end
-  end
-
-  def dealer_hit
-    casino_hand << deck.draw
-    puts "The dealer drew a #{casino_hand.last}"
-    dealer_turn
   end
 
   def ask_for_rematch
