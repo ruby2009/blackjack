@@ -26,7 +26,11 @@ class Game
   end
 
   def read_dealer_hand
-    puts "The dealer has a #{casino_hand[0]} face up"
+    puts "The dealer has #{casino_hand[0]} face up"
+    if casino_hand_total == 21
+      puts "Blackjack house wins! They were also holding #{casino_hand[1]}"
+      ask_for_rematch
+    end
   end
 
   def read_player_hand
@@ -34,6 +38,10 @@ class Game
       gambler_hand.each do |card|
         puts card
       end
+    if gambler_hand_total == 21
+      puts "Blackjack! You win!"
+      ask_for_rematch
+    end
       game_loop
   end
 
@@ -47,7 +55,6 @@ class Game
       win_conditions
     elsif casino_hand_total > 21
       puts "Busted!!! House sucks!"
-      win_conditions
     else
       dealer_hit
     end
@@ -78,6 +85,14 @@ class Game
     casino_hand.inject(0){|sum, card| sum + card.value}
   end
 
+  def gambler_hand_counter
+    gambler_hand.size
+  end
+
+  def casino_hand_counter
+    casino_hand.size
+  end
+
   def hit
     gambler_hand << deck.draw
     puts gambler_hand.last
@@ -89,25 +104,12 @@ class Game
 
   def gambler_win_or_bust
     if gambler_hand_total > 21
-      puts "Busted!"
-      win_conditions
+      puts "Busted! You lost."
       ask_for_rematch
     elsif gambler_hand_total < 21
       puts gambler_hand_total
     else
       puts "Bingo! That's 21!"
-      win_conditions
-      ask_for_rematch
-    end
-  end
-
-  def casino_win_or_bust
-    if casino_hand_total > 21
-      puts "The dealer busted!"
-    elsif casino_hand_total < 21
-      puts casino_hand_total
-    else
-      puts "Damn, the dealer's lucky. That's 21!"
       win_conditions
       ask_for_rematch
     end
@@ -119,9 +121,25 @@ class Game
     end
   end
 
+  def tie
+    if gambler_hand_counter > casino_hand_counter
+      puts "You win, you had #{gambler_hand_counter} cards and the dealer only had #{casino_hand_counter}."
+    elsif
+      gambler_hand_counter < casino_hand_counter
+        puts "You lost, you had #{gambler_hand_counter} cards and the dealer had #{casino_hand_counter}."
+    else
+      puts "Double tie. We'll give that one to ya!"
+    end
+  end
+
   def win_conditions
+    if gambler_hand_counter == 6 && gambler_hand_total < 21
+      puts "You win with 6 cards. Rare but it can happen!"
+    end
     if gambler_hand_total > casino_hand_total
       puts "You beat the house. Good win."
+    elsif gambler_hand_total == casino_hand_total
+      tie
     else
       puts "The dealer won. Boo..."
     end
@@ -142,10 +160,6 @@ class Game
       exit
     end
   end
-
-
-
-
 end
 
 Game.new
